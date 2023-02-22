@@ -5,28 +5,25 @@ if (Test-Path ~\AppData\Local\Microsoft\WindowsApps\winget.exe){
 else{
     # Installing winget from the Microsoft Store
 	Write-Host "Winget not found, installing it now."
-    $ResultText.text = "`r`n" +"`r`n" + "Installing Winget... Please Wait"
-	Start-Process "ms-appinstaller:?source=https://aka.ms/getwinget"
+   	Start-Process "ms-appinstaller:?source=https://aka.ms/getwinget"
 	$nid = (Get-Process AppInstaller).Id
 	Wait-Process -Id $nid
-	Write-Host Winget Installed
-    $ResultText.text = "`r`n" +"`r`n" + "Winget Installed - Ready for Next Task"
+	Write-Host "Winget Installed"
+   
 }
   Write-Host "Creating Restore Point incase something bad happens"
-    $ResultText.text = "`r`n" +"`r`n" + "Installing Essential Tools... Please Wait" 
-    Enable-ComputerRestore -Drive "C:\"
+      Enable-ComputerRestore -Drive "C:\"
     Checkpoint-Computer -Description "RestorePoint1" -RestorePointType "MODIFY_SETTINGS"
 
     Write-Host "Running O&O Shutup with Recommended Settings"
-    $ResultText.text += "`r`n" +"Running O&O Shutup with Recommended Settings"
+  
     Import-Module BitsTransfer
     Start-BitsTransfer -Source "https://raw.githubusercontent.com/ChrisTitusTech/win10script/master/ooshutup10.cfg" -Destination ooshutup10.cfg
     Start-BitsTransfer -Source "https://dl5.oo-software.com/files/ooshutup10/OOSU10.exe" -Destination OOSU10.exe
     ./OOSU10.exe ooshutup10.cfg /quiet
 
     Write-Host "Disabling Telemetry..."
-    $ResultText.text += "`r`n" +"Disabling Telemetry..."
-    Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "AllowTelemetry" -Type DWord -Value 0
+       Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "AllowTelemetry" -Type DWord -Value 0
     Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Type DWord -Value 0
     Disable-ScheduledTask -TaskName "Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" | Out-Null
     Disable-ScheduledTask -TaskName "Microsoft\Windows\Application Experience\ProgramDataUpdater" | Out-Null
@@ -158,7 +155,7 @@ else{
     }
 
     Write-Host "Changing default Explorer view to This PC..."
-    $ResultText.text += "`r`n" +"Quality of Life Tweaks"
+   
     Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "LaunchTo" -Type DWord -Value 1
 
     Write-Host "Hiding 3D Objects icon from This PC..."
@@ -199,7 +196,6 @@ else{
 	#Enable-WindowsOptionalFeature -Online -FeatureName "WindowsMediaPlayer" -NoRestart -WarningAction SilentlyContinue | Out-Null
 
     Write-Host "Disable News and Interests"
-    $ResultText.text += "`r`n" +"Disabling Extra Junk"
     Set-ItemProperty -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds" -Name "EnableFeeds" -Type DWord -Value 0
     # Remove "News and Interest" from taskbar
     Set-ItemProperty -Path  "HKCU:\Software\Microsoft\Windows\CurrentVersion\Feeds" -Name "ShellFeedsTaskbarViewMode" -Type DWord -Value 2
@@ -324,15 +320,12 @@ foreach ($service in $services) {
     Get-Service -Name $service -ErrorAction SilentlyContinue | Set-Service -StartupType Manual
 }
 
-    Write-Host "Essential Tweaks Completed - Please Reboot"
-    $ResultText.text = "`r`n" + "Essential Tweaks Done" + "`r`n" + "`r`n" + "Ready for Next Task"
 
 
 $dualboottime.Add_Click({
 Write-Host "Setting BIOS time to UTC..."
     Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\TimeZoneInformation" -Name "RealTimeIsUniversal" -Type DWord -Value 1
-    $ResultText.text = "`r`n" + "Time set to UTC for consistent time in Dual Boot Systems" + "`r`n" + "`r`n" + "Ready for Next Task"
-})
+    })
 
 $laptopnumlock.Add_Click({
     Set-ItemProperty -Path "HKU:\.DEFAULT\Control Panel\Keyboard" -Name "InitialKeyboardIndicators" -Type DWord -Value 0
@@ -345,8 +338,7 @@ $laptopnumlock.Add_Click({
 
 $essentialundo.Add_Click({
     Write-Host "Creating Restore Point incase something bad happens"
-    $ResultText.text = "`r`n" +"`r`n" + "Creating Restore Point and Reverting Settings... Please Wait"
-    Enable-ComputerRestore -Drive "C:\"
+      Enable-ComputerRestore -Drive "C:\"
     Checkpoint-Computer -Description "RestorePoint1" -RestorePointType "MODIFY_SETTINGS"
     Write-Host "Disabling Background application access..."
     Get-ChildItem -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" -Exclude "Microsoft.Windows.Cortana*" | ForEach {
@@ -354,8 +346,7 @@ $essentialundo.Add_Click({
         Set-ItemProperty -Path $_.PsPath -Name "DisabledByUser" -Type DWord -Value 1
     }
     Write-Host "Disabled Background application access"
-    $ResultText.text = "`r`n" +"`r`n" + "Disabled Background application access"
-})
+    })
 
 $cortana.Add_Click({
     Write-Host "Disabling Cortana..."
@@ -377,7 +368,7 @@ $cortana.Add_Click({
     }
     Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "AllowCortana" -Type DWord -Value 0
     Write-Host "Disabled Cortana"
-    $ResultText.text = "`r`n" +"`r`n" + "Disabled Cortana"
+    
 })
 
 $Bloatware = @(
@@ -478,11 +469,13 @@ $removebloat.Add_Click({
         Get-AppxPackage -Name $Bloat| Remove-AppxPackage
         Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $Bloat | Remove-AppxProvisionedPackage -Online
         Write-Host "Trying to remove $Bloat."
-        $ResultText.text = "`r`n" +"`r`n" + "Trying to remove $Bloat."
+      
+        
     }
 
     Write-Host "Finished Removing Bloatware Apps"
-    $ResultText.text = "`r`n" +"`r`n" + "Finished Removing Bloatware Apps"
+   
+    
 })
 $securitywindowsupdate.Add_Click({
     Write-Host "Disabling driver offering through Windows Update..."
@@ -507,7 +500,7 @@ $securitywindowsupdate.Add_Click({
     Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name "NoAutoRebootWithLoggedOnUsers" -Type DWord -Value 1
     Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name "AUPowerManagement" -Type DWord -Value 0
     Write-Host "Disabled driver offering through Windows Update"
-    $ResultText.text = "`r`n" +"`r`n" + "Set Windows Update to Sane Settings"
+  
 })
 
 $actioncenter.Add_Click({
@@ -518,7 +511,7 @@ $actioncenter.Add_Click({
     Set-ItemProperty -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer" -Name "DisableNotificationCenter" -Type DWord -Value 1
     Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\PushNotifications" -Name "ToastEnabled" -Type DWord -Value 0
     Write-Host "Disabled Action Center"
-    $ResultText.text = "`r`n" +"`r`n" + "Disabled Action Center"
+    
 })
 
 $performancefx.Add_Click({
@@ -534,7 +527,7 @@ $performancefx.Add_Click({
     Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" -Name "VisualFXSetting" -Type DWord -Value 3
     Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\DWM" -Name "EnableAeroPeek" -Type DWord -Value 0
     Write-Host "Adjusted visual effects for performance"
-    $ResultText.text = "`r`n" +"`r`n" + "Adjusted VFX for performance"
+   
 })
 $onedrive.Add_Click({
     Write-Host "Disabling OneDrive..."
@@ -563,12 +556,11 @@ $onedrive.Add_Click({
     Remove-Item -Path "HKCR:\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" -Recurse -ErrorAction SilentlyContinue
     Remove-Item -Path "HKCR:\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" -Recurse -ErrorAction SilentlyContinue
     Write-Host "Disabled OneDrive"
-    $ResultText.text = "`r`n" +"`r`n" + "Deleted and Disabled OneDrive"
 })
 
 $darkmode.Add_Click({
     Write-Host "Enabling Dark Mode"
     Set-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name AppsUseLightTheme -Value 0
     Write-Host "Enabled Dark Mode"
-    $ResultText.text = "`r`n" +"`r`n" + "Enabled Dark Mode"
+   
 })

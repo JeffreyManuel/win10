@@ -320,24 +320,21 @@ foreach ($service in $services) {
 
 
 
-$dualboottime.Add_Click({
-Write-Host "Setting BIOS time to UTC..."
-    Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\TimeZoneInformation" -Name "RealTimeIsUniversal" -Type DWord -Value 1
-    })
 
-$essentialundo.Add_Click({
-    Write-Host "Creating Restore Point incase something bad happens"
-      Enable-ComputerRestore -Drive "C:\"
-    Checkpoint-Computer -Description "RestorePoint1" -RestorePointType "MODIFY_SETTINGS"
+Write-Host "Setting BIOS time to UTC..." {
+ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\TimeZoneInformation" -Name "RealTimeIsUniversal" -Type DWord -Value 1
+}
+
+
     Write-Host "Disabling Background application access..."
     Get-ChildItem -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" -Exclude "Microsoft.Windows.Cortana*" | ForEach {
         Set-ItemProperty -Path $_.PsPath -Name "Disabled" -Type DWord -Value 1
         Set-ItemProperty -Path $_.PsPath -Name "DisabledByUser" -Type DWord -Value 1
     }
     Write-Host "Disabled Background application access"
-    })
+   
 
-$cortana.Add_Click({
+
     Write-Host "Disabling Cortana..."
     If (!(Test-Path "HKCU:\SOFTWARE\Microsoft\Personalization\Settings")) {
         New-Item -Path "HKCU:\SOFTWARE\Microsoft\Personalization\Settings" -Force | Out-Null
@@ -358,7 +355,7 @@ $cortana.Add_Click({
     Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "AllowCortana" -Type DWord -Value 0
     Write-Host "Disabled Cortana"
     
-})
+
 
 $Bloatware = @(
     #Unnecessary Windows 10 AppX Apps
@@ -451,7 +448,7 @@ $Bloatware = @(
     #"*Microsoft.WindowsStore*"
 )
 
-$removebloat.Add_Click({
+({
     Write-Host "Removing Bloatware"
 
     foreach ($Bloat in $Bloatware) {
@@ -466,7 +463,7 @@ $removebloat.Add_Click({
    
     
 })
-$securitywindowsupdate.Add_Click({
+
     Write-Host "Disabling driver offering through Windows Update..."
     If (!(Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Device Metadata")) {
         New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Device Metadata" -Force | Out-Null
@@ -490,9 +487,8 @@ $securitywindowsupdate.Add_Click({
     Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name "AUPowerManagement" -Type DWord -Value 0
     Write-Host "Disabled driver offering through Windows Update"
   
-})
 
-$actioncenter.Add_Click({
+
     Write-Host "Disabling Action Center..."
     If (!(Test-Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer")) {
         New-Item -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer" | Out-Null
@@ -501,9 +497,9 @@ $actioncenter.Add_Click({
     Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\PushNotifications" -Name "ToastEnabled" -Type DWord -Value 0
     Write-Host "Disabled Action Center"
     
-})
 
-$performancefx.Add_Click({
+
+({
     Write-Host "Adjusting visual effects for performance..."
     Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "DragFullWindows" -Type String -Value 0
     Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "MenuShowDelay" -Type String -Value 200
@@ -518,7 +514,7 @@ $performancefx.Add_Click({
     Write-Host "Adjusted visual effects for performance"
    
 })
-$onedrive.Add_Click({
+$({
     Write-Host "Disabling OneDrive..."
     If (!(Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive")) {
         New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive" | Out-Null
@@ -547,7 +543,7 @@ $onedrive.Add_Click({
     Write-Host "Disabled OneDrive"
 })
 
-$darkmode.Add_Click({
+({
     Write-Host "Enabling Dark Mode"
     Set-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name AppsUseLightTheme -Value 0
     Write-Host "Enabled Dark Mode"

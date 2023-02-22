@@ -291,10 +291,10 @@ Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies
     "cbdhsvc_48486de"                               #Disables   cbdhsvc_48486de (clipboard service it disables)
     #"BluetoothUserService_48486de"                  #disbales BluetoothUserService_48486de (The Bluetooth user service supports proper functionality of Bluetooth features relevant to each user session.)
     "WpnService"                                    #Disables WpnService (Push Notifications may not work )
-    #"StorSvc"                                       #Disables StorSvc (usb external hard drive will not be reconised by windows)
+    "StorSvc"                                       #Disables StorSvc (usb external hard drive will not be reconised by windows)
     "RtkBtManServ"                                  #Disables Realtek Bluetooth Device Manager Service
     "QWAVE"                                         #Disables Quality Windows Audio Video Experience (audio and video might sound worse)
-     #Hp services
+     Hp services
     "HPAppHelperCap"
     "HPDiagsCap"
     "HPNetworkCap"
@@ -314,9 +314,7 @@ Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies
 )
 
 foreach ($service in $services) {
-    # -ErrorAction SilentlyContinue is so it doesn't write an error to stdout if a service doesn't exist
-
-    Write-Host "Setting $service StartupType to Manual"
+      Write-Host "Setting $service StartupType to Manual"
     Get-Service -Name $service -ErrorAction SilentlyContinue | Set-Service -StartupType Manual
 }
 
@@ -326,15 +324,6 @@ $dualboottime.Add_Click({
 Write-Host "Setting BIOS time to UTC..."
     Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\TimeZoneInformation" -Name "RealTimeIsUniversal" -Type DWord -Value 1
     })
-
-$laptopnumlock.Add_Click({
-    Set-ItemProperty -Path "HKU:\.DEFAULT\Control Panel\Keyboard" -Name "InitialKeyboardIndicators" -Type DWord -Value 0
-    Add-Type -AssemblyName System.Windows.Forms
-    If (([System.Windows.Forms.Control]::IsKeyLocked('NumLock'))) {
-        $wsh = New-Object -ComObject WScript.Shell
-        $wsh.SendKeys('{NUMLOCK}')
-    }
-})
 
 $essentialundo.Add_Click({
     Write-Host "Creating Restore Point incase something bad happens"

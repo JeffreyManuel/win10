@@ -8,7 +8,7 @@ else{
 	Write-Host Winget Installed
    
 }
-winget install -e BraveSoftware.BraveBrowser
+winget install -e Brave.Brave
 winget install -e Google.Chrome
 winget install -e Lexikos.AutoHotkey 
 winget install -e Discord.Discord
